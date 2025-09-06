@@ -1,17 +1,22 @@
-# Build / artefacts
+# Node / web
 node_modules/
 dist/
 build/
 www/
+
+# Capacitor / Android
 android/.gradle/
+android/build/
 android/app/build/
 capacitor-cordova-android-plugins/build/
 
-# Locaux / temp
-$LOG
-$PID
+# IDE / OS
 .DS_Store
 *.iml
 *.keystore
 *.jks
 *.env
+
+# Termux logs
+$LOG
+$PID
