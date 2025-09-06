@@ -1,22 +1,17 @@
-# Node / Capacitor
+# Build / artefacts
 node_modules/
-www/
 dist/
 build/
-
-# Android/Gradle
+www/
 android/.gradle/
-android/.idea/
-android/local.properties
 android/app/build/
-android/build/
 capacitor-cordova-android-plugins/build/
 
-# OS/Editor
+# Locaux / temp
+$LOG
+$PID
 .DS_Store
 *.iml
-
-# Clés/Secrets
 *.keystore
 *.jks
 *.env
