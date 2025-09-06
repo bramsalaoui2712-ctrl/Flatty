@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "live-server www"
+    "start": "live-server www",
+    "cap:copy": "npx cap copy android",
+    "android:build": "cd android && ./gradlew assembleDebug",
+    "android:clean": "cd android && ./gradlew clean"
   },
   "devDependencies": {
     "live-server": "^1.2.2"
