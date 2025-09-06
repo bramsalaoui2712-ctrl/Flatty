@@ -1,0 +1,22 @@
+# Node / Capacitor
+node_modules/
+www/
+dist/
+build/
+
+# Android/Gradle
+android/.gradle/
+android/.idea/
+android/local.properties
+android/app/build/
+android/build/
+capacitor-cordova-android-plugins/build/
+
+# OS/Editor
+.DS_Store
+*.iml
+
+# Clés/Secrets
+*.keystore
+*.jks
+*.env
