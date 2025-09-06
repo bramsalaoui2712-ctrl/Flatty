@@ -2,7 +2,6 @@
 node_modules/
 dist/
 build/
-www/
 
 # Capacitor / Android
 android/.gradle/
