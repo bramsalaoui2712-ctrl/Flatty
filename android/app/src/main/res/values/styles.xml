@@ -17,4 +17,5 @@
         <!-- Thème à appliquer après le splash -->
         <item name="postSplashScreenTheme">@style/AppTheme</item>
     </style>
+    <style name="AppTheme.NoActionBarLaunch" parent="@style/Theme.SplashScreen"/>
 </resources>
