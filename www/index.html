@@ -1,3 +1,25 @@
 <!doctype html>
-<html><head><meta charset="utf-8"><title>Flatty</title></head>
-<body><h1>Flatty</h1><p>Build CI</p></body></html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+  <title>Flappy Cube</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="hud">
+    <div class="score">Score: <span id="score">0</span></div>
+    <div class="best">Best: <span id="best">0</span></div>
+  </div>
+
+  <canvas id="game"></canvas>
+
+  <div id="overlay" class="hidden">
+    <h1 id="title">Flappy Cube</h1>
+    <p id="subtitle">Touchez l'écran pour sauter</p>
+    <button id="btnStart">Jouer</button>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
