@@ -20,3 +20,6 @@ capacitor-cordova-android-plugins/build/
 $LOG
 $PID
 keystore.txt
+
+# backups
+*.bak
