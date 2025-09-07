@@ -1,5 +1,4 @@
 name: build-android-release
-
 on:
   push:
     tags:
@@ -8,7 +7,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-24.04
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -41,6 +39,21 @@ jobs:
       - name: Build Android APK (release, unsigned)
         run: cd android && ./gradlew --no-daemon assembleRelease
 
+      # === Vérification des secrets / keystore AVANT la signature ===
+      - name: Verify keystore secrets
+        shell: bash
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: |
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > tmp.jks
+          echo "[info] Keystore size: $(wc -c < tmp.jks) bytes"
+          keytool -list -keystore tmp.jks -storepass "$ANDROID_KEYSTORE_PASSWORD" >/dev/null
+          keytool -list -v -keystore tmp.jks -alias "$ANDROID_KEY_ALIAS" -storepass "$ANDROID_KEYSTORE_PASSWORD" -keypass "$ANDROID_KEY_PASSWORD" >/dev/null
+          echo "[ok] Keystore + alias + mots de passe vérifiés."
+
       - name: Sign APK
         id: sign
         uses: r0adkll/sign-android-release@v1
@@ -60,7 +73,7 @@ jobs:
           path: ${{ steps.sign.outputs.signedReleaseFile }}
 
       - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
           files: ${{ steps.sign.outputs.signedReleaseFile }}
-        if: startsWith(github.ref, 'refs/tags/')
