@@ -1,38 +1,42 @@
-name: Android APK (Debug)
+name: Android CI (APK Debug)
 
 on:
   push:
     branches: [ main ]
-  workflow_dispatch:
+  pull_request:
+    branches: [ main ]
 
 jobs:
   build-android:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: 20
+          cache: npm
 
-      - name: Install dependencies
+      - name: Install deps
         run: npm ci
 
-      - name: Sync/copy Capacitor (Android)
+      - name: Capacitor copy (web → android)
         run: npx cap copy android
 
-      - name: Setup Java (JDK 17)
+      - name: Capacitor sync (plugins)
+        run: npx cap sync android
+
+      - name: Setup Java 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
-          cache: 'gradle'
+          java-version: 17
+          cache: gradle
 
-      - name: Build APK (assembleDebug)
+      - name: Build Android APK (debug)
         working-directory: android
         run: |
           chmod +x gradlew
@@ -42,4 +46,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: app-debug.apk
-          path: android/app/build/outputs/apk/debug/*.apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
