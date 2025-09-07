@@ -1,18 +1,13 @@
-name: Release Android APK (signed) on tag
+name: build-android-release
 
 on:
   push:
     tags:
-      - "v*.*.*"   # ex: v1.0.1
+      - 'v*'
 
 jobs:
-  build-release:
-    name: build-android-release
+  build:
     runs-on: ubuntu-24.04
-
-    env:
-      # Optionnel : supprime l'avertissement compileSdk 35
-      ORG_GRADLE_PROJECT_android_suppressUnsupportedCompileSdk: "35"
 
     steps:
       - name: Checkout
@@ -22,7 +17,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
 
       - name: Install deps
         run: npm ci
@@ -38,30 +32,25 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-          cache: gradle
 
-      # Certaines images tirent Gradle 8.4 par défaut ; on force une version OK
       - name: Force Gradle 8.6 wrapper (si besoin)
         run: |
           sed -i 's/gradle-[0-9.]\+-\(all\|bin\)\.zip/gradle-8.6-all.zip/' android/gradle/wrapper/gradle-wrapper.properties
           grep distributionUrl android/gradle/wrapper/gradle-wrapper.properties
 
       - name: Build Android APK (release, unsigned)
-        working-directory: android
-        run: ./gradlew --no-daemon assembleRelease
+        run: cd android && ./gradlew --no-daemon assembleRelease
 
-      # --- Signature + zipalign via action dédiée ---
       - name: Sign APK
         id: sign
         uses: r0adkll/sign-android-release@v1
         with:
           releaseDirectory: android/app/build/outputs/apk/release
-          signingKeyBase64: ${{ secrets.KEYSTORE_BASE64 }}
-          alias: ${{ secrets.KEY_ALIAS }}
-          keyStorePassword: ${{ secrets.KEYSTORE_PASSWORD }}
-          keyPassword: ${{ secrets.KEY_PASSWORD }}
+          signingKeyBase64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          alias: ${{ secrets.ANDROID_KEY_ALIAS }}
+          keyStorePassword: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          keyPassword: ${{ secrets.ANDROID_KEY_PASSWORD }}
         env:
-          # Utilise la version build-tools disponible (35 est OK)
           BUILD_TOOLS_VERSION: "35.0.0"
 
       - name: Upload APK artifact
@@ -73,8 +62,5 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          draft: false
-          prerelease: false
           files: ${{ steps.sign.outputs.signedReleaseFile }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: startsWith(github.ref, 'refs/tags/')
