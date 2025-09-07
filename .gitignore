@@ -19,3 +19,4 @@ capacitor-cordova-android-plugins/build/
 # Termux logs
 $LOG
 $PID
+keystore.txt
