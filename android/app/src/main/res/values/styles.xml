@@ -1,21 +1,8 @@
 <resources>
-    <!-- Thème principal de l'app après l'écran de splash -->
-    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <!-- Couleurs de base ; si tu as déjà un colors.xml, ça prendra celles-ci -->
-        <item name="colorPrimary">@color/purple_500</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
-        <item name="colorOnPrimary">@color/white</item>
-        <item name="android:statusBarColor">@color/purple_700</item>
-    </style>
-
-    <!-- Thème de l'écran de splash (Android 12+ via core-splashscreen, rétro-compatible) -->
-    <style name="Theme.SplashScreen" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <!-- Fond de l'écran -->
-        <item name="windowSplashScreenBackground">@color/black</item>
-        <!-- Icône de splash (mets un drawable existant si tu veux autre chose) -->
-        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
-        <!-- Thème à appliquer après le splash -->
-        <item name="postSplashScreenTheme">@style/AppTheme</item>
-    </style>
-    <style name="AppTheme.NoActionBarLaunch" parent="@style/Theme.SplashScreen"/>
+  <!-- Thème principal -->
+  <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar"/>
+  <!-- Thème utilisé au lancement (déclaré dans le Manifest) -->
+  <style name="AppTheme.NoActionBarLaunch" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <item name="android:windowFullscreen">false</item>
+  </style>
 </resources>

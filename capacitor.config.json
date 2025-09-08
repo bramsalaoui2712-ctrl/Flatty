@@ -1,5 +1,6 @@
 {
-  "appId": "com.flappy.cube",
+  "appId": "com.brams.flappycube",
   "appName": "FlappyCube",
-  "webDir": "www"
+  "webDir": "www",
+  "bundledWebRuntime": false
 }

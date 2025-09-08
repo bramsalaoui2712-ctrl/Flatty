@@ -11,11 +11,11 @@ repositories {
 }
 
 android {
-    namespace "com.example.flappycube"
+    namespace "com.brams.flappycube"
     compileSdkVersion 35
 
     defaultConfig {
-        applicationId "com.example.flappycube"
+        applicationId "com.brams.flappycube"
         minSdkVersion 23
         targetSdkVersion 35
         versionCode 1
