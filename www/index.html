@@ -2,25 +2,33 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
-  <title>Flappy Cube</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Alchimia Mechanica – MVP</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div id="hud">
-    <div class="score">Score: <span id="score">0</span></div>
-    <div class="best">Best: <span id="best">0</span></div>
-  </div>
+  <header class="topbar">
+    <h1>Alchimia Mechanica</h1>
+    <div class="actions">
+      <button id="btn-reset" title="Réinitialiser le niveau">↺ Rejouer</button>
+    </div>
+  </header>
 
-  <canvas id="game"></canvas>
+  <main class="layout">
+    <aside class="inventory" id="inventory"></aside>
+    <section class="board-wrap">
+      <canvas id="board" width="900" height="700"></canvas>
+      <div class="hud">
+        <div id="hint">Place les pièces pour relier la Source au Récepteur.</div>
+        <div id="status"></div>
+      </div>
+    </section>
+  </main>
 
-  <div id="overlay" class="hidden">
-    <h1 id="title">Flappy Cube</h1>
-    <p id="subtitle">Touchez l'écran pour sauter</p>
-    <button id="btnStart">Jouer</button>
-  </div>
+  <footer class="bottombar">
+    <div>Tap/clic pour placer • Clic droit/long press pour supprimer • R pour pivoter</div>
+  </footer>
 
-  <script src="debug-overlay.js"></script>
-    <script src="game.js"> </script>
+  <script src="game.js"></script>
 </body>
 </html>
