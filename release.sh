@@ -1,66 +1,99 @@
 #!/usr/bin/env bash
+# release.sh — Générique pour n’importe quel projet Capacitor déjà câblé avec GitHub Actions
+# Usage:
+#   ./release.sh "mon-label-de-release"
+# Comportement:
+#   - npx cap copy/sync (pas de build local)
+#   - commit + push sur la branche courante
+#   - création d’un tag vX.Y.Z auto-incrémenté + push du tag
+#   - déclenche ton workflow GitHub (release.yml)
+
 set -euo pipefail
 
-REPO_DIR="$HOME/flappycube_auto"
-KEY="${KEY:-$HOME/.ssh/id_ed25519}"     # change si besoin (id_rsa, etc.)
-TAG="${1:-}"                            # ex: v1.1.0
-MSG="${2:-}"                            # note courte optionnelle
+LABEL="${1:-release}"   # Sert à décrire la release (message de commit & tag)
+DATE_UTC="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
 
-# --- helpers ---
-die(){ echo "❌ $*" >&2; exit 1; }
-info(){ echo "==> $*"; }
+# --- garde-fous utiles ---
+require() { command -v "$1" >/dev/null 2>&1 || { echo "❌ '$1' introuvable. Installe-le et réessaie."; exit 1; }; }
+require git
+require node
+require npx
 
-[[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || die "Tag invalide. Utilise le format vX.Y.Z (ex: v1.1.0)."
+# Vérif repo git
+git rev-parse --is-inside-work-tree >/dev/null 2>&1 || { echo "❌ Pas dans un dépôt Git."; exit 1; }
+BRANCH="$(git rev-parse --abbrev-ref HEAD || echo main)"
+echo "🔧 Branche courante: $BRANCH"
 
-# 0) Clé SSH prête
-eval "$(ssh-agent -s)" >/dev/null 2>&1 || true
-[[ -f "$KEY" ]] || die "Clé privée introuvable: $KEY"
-ssh-add "$KEY" >/dev/null 2>&1 || true
-mkdir -p "$HOME/.ssh"
-ssh-keyscan -H github.com >> "$HOME/.ssh/known_hosts" 2>/dev/null || true
-chmod 600 "$HOME/.ssh/known_hosts" || true
+# Vérif répertoires utiles
+[ -d "www" ] || { echo "❌ Dossier 'www' manquant (index.html, game.js, style.css...)."; exit 1; }
 
-# 1) Aller dans le dépôt
-cd "$REPO_DIR" || die "Dépôt introuvable: $REPO_DIR"
-git rev-parse --is-inside-work-tree >/dev/null 2>&1 || die "Ici ce n'est pas un dépôt git."
+# --- Capacitor: copy & sync (léger, pas de build local) ---
+echo "⚙️  Capacitor copy & sync (pas de build local)..."
+npx cap copy android
+npx cap sync android
+echo "✅ Capacitor OK"
 
-# 2) Branche + statut
-BRANCH="$(git branch --show-current)"
-[[ -n "$BRANCH" ]] || die "Aucune branche active."
-git fetch origin || true
+# --- Stage & commit s'il y a des changements ---
+echo "📦 Préparation du commit..."
+git add -A
 
-# 3) Arbre propre ?
-if ! git diff --quiet || ! git diff --cached --quiet; then
-  die "Il y a des changements non commit. Commit d'abord puis relance."
-fi
-
-# 4) Pousser la branche courante (au cas où)
-info "Push de la branche '$BRANCH'…"
-GIT_SSH_COMMAND="ssh -o IdentitiesOnly=yes -i $KEY" git push -u origin "$BRANCH"
-
-# 5) Créer le tag (annoté si un message est fourni)
-if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
-  die "Le tag $TAG existe déjà."
-fi
-if [[ -n "$MSG" ]]; then
-  info "Création du tag annoté $TAG…"
-  git tag -a "$TAG" -m "$MSG"
+if ! git diff --cached --quiet; then
+  git commit -m "release: ${LABEL} (${DATE_UTC})"
+  echo "✅ Commit créé."
 else
-  info "Création du tag léger $TAG…"
-  git tag "$TAG"
+  echo "ℹ️  Aucun changement à committer (on continue)."
 fi
 
-# 6) Push du tag
-info "Push du tag $TAG vers origin…"
-GIT_SSH_COMMAND="ssh -o IdentitiesOnly=yes -i $KEY" git push origin "$TAG"
+# --- Push branche ---
+echo "🚀 Push branche '$BRANCH' vers origin..."
+git push -u origin "$BRANCH"
+echo "✅ Push OK."
 
-cat <<NOTE
+# --- Calcul du prochain tag sémantique vX.Y.Z ---
+next_patch() {
+  local tag="$1"
+  if [[ "$tag" =~ ^v([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+    local major="${BASH_REMATCH[1]}"
+    local minor="${BASH_REMATCH[2]}"
+    local patch="${BASH_REMATCH[3]}"
+    echo "v${major}.${minor}.$((patch+1))"
+  else
+    # Tag non sémantique → on repart propre
+    echo "v1.0.0"
+  fi
+}
 
-✅ C'est parti !
-- Le tag **$TAG** est poussé.
-- GitHub Actions va construire l’APK et créer la Release automatiquement (workflow).
-- Tu trouveras l'APK dans la Release associée au tag.
+# Dernier tag sémver vX.Y.Z (ou par défaut v1.0.0)
+LAST_V_TAG="$(git tag --list 'v[0-9]*.[0-9]*.[0-9]*' --sort=-v:refname | head -n1 || true)"
+if [[ -z "$LAST_V_TAG" ]]; then
+  CANDIDATE="v1.0.0"
+else
+  CANDIDATE="$(next_patch "$LAST_V_TAG")"
+fi
+
+# Si le tag candidat existe déjà, on incrémente jusqu’à trouver un libre
+while git rev-parse -q --verify "refs/tags/${CANDIDATE}" >/dev/null 2>&1; do
+  CANDIDATE="$(next_patch "$CANDIDATE")"
+done
+NEW_TAG="$CANDIDATE"
+
+# --- Création + push du tag ---
+echo "🏷️  Création du tag ${NEW_TAG}..."
+git tag -a "${NEW_TAG}" -m "release: ${LABEL} (${DATE_UTC})"
+git push origin "${NEW_TAG}"
+echo "✅ Tag poussé: ${NEW_TAG}"
+
+cat <<EOF
+
+🎉 Fini.
+- Branche       : ${BRANCH} (poussée)
+- Tag créé      : ${NEW_TAG} (poussé)
+- Label release : ${LABEL}
+
+🔔 Ton workflow GitHub (release.yml) doit maintenant se déclencher automatiquement
+   et produire l'APK signé dans la page de la Release / ou en Artifact.
 
 Astuce:
-- Pour une note: ./release.sh $TAG "Ma courte note"
-NOTE
+- Pour relancer: ./release.sh "ton-label-suivant"
+- Le script incrémente automatiquement la version sémantique (vX.Y.Z).
+EOF
