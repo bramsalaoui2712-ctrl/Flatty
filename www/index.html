@@ -1,33 +1,83 @@
+<!-- ============================
+www/index.html
+============================ -->
 <!doctype html>
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Alchimia Mechanica – MVP</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Alchimia Mechanica</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header class="topbar">
-    <h1>Alchimia Mechanica</h1>
-    <div class="actions">
-      <button id="btn-reset" title="Réinitialiser le niveau">↺ Rejouer</button>
+    <div class="brand">
+      <span class="logo">🜁</span>
+      <div>
+        <h1>Alchimia Mechanica</h1>
+        <p class="subtitle">Artisan Mécaniste — Reliez l’énergie aux récepteurs</p>
+      </div>
+    </div>
+
+    <div class="controls">
+      <label class="select-wrap">
+        Monde/Niveau
+        <select id="levelSelect"></select>
+      </label>
+
+      <button id="undoBtn" class="btn">↶ Annuler</button>
+      <button id="resetBtn" class="btn">⟲ Réinitialiser</button>
+      <button id="helpBtn" class="btn ghost">? Aide</button>
     </div>
   </header>
 
   <main class="layout">
-    <aside class="inventory" id="inventory"></aside>
-    <section class="board-wrap">
-      <canvas id="board" width="900" height="700"></canvas>
-      <div class="hud">
-        <div id="hint">Place les pièces pour relier la Source au Récepteur.</div>
-        <div id="status"></div>
+    <aside class="sidebar">
+      <h2>Inventaire</h2>
+      <div id="inventory" class="inventory"></div>
+
+      <h2>Outil</h2>
+      <div class="tool-row">
+        <button data-tool="rotate" class="tool-btn">⟳ Tourner</button>
+        <button data-tool="erase" class="tool-btn">⌫ Effacer</button>
       </div>
+
+      <div class="legend">
+        <h3>Légende</h3>
+        <ul>
+          <li><span class="badge src red"></span> Source rouge</li>
+          <li><span class="badge src blue"></span> Source bleue</li>
+          <li><span class="badge recv red"></span> Récepteur rouge</li>
+          <li><span class="badge recv blue"></span> Récepteur bleu</li>
+          <li><span class="badge pipe"></span> Conduit (ligne)</li>
+          <li><span class="badge tee"></span> Connecteur en T</li>
+          <li><span class="badge cross"></span> Connecteur en croix</li>
+          <li><span class="badge prism"></span> Prisme (croisement sans mélange)</li>
+        </ul>
+      </div>
+
+      <div class="tips">
+        <h3>Astuce</h3>
+        <p>Tape/clic = placer. Long-press/clic droit = tourner. Sélectionne une pièce dans l’inventaire avant de placer.</p>
+      </div>
+    </aside>
+
+    <section class="stage">
+      <canvas id="game" width="1100" height="900" aria-label="Grille hexagonale"></canvas>
+      <div id="toast" class="toast" role="status" aria-live="polite"></div>
     </section>
   </main>
 
-  <footer class="bottombar">
-    <div>Tap/clic pour placer • Clic droit/long press pour supprimer • R pour pivoter</div>
-  </footer>
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <h2>Bravo !</h2>
+      <p id="winText">Vous avez réactivé toutes les machines.</p>
+      <div class="modal-actions">
+        <button id="nextBtn" class="btn">Niveau suivant ▶</button>
+        <button id="closeModalBtn" class="btn ghost">Fermer</button>
+      </div>
+    </div>
+  </div>
 
   <script src="game.js"></script>
 </body>
