@@ -3,966 +3,1049 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alchimia Mechanica - Jeu Fonctionnel</title>
+    <title>Royal Match Deluxe</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --bg: #0d0f12;
-            --panel: #171a1f;
-            --muted: #8b96a7;
-            --text: #e7eef9;
-            --accent: #ffd24a;
-            --ok: #5bd18b;
-            --bad: #ff6b6b;
-            --line: #242a33;
-        }
-        
-        * { 
-            box-sizing: border-box; 
+        * {
             margin: 0;
             padding: 0;
-        }
-        
-        html, body {
-            height: 100%;
-            background: var(--bg);
-            color: var(--text);
+            box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden;
+            user-select: none;
         }
         
         body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
-            padding: 10px;
-            gap: 10px;
+            align-items: center;
+            color: white;
+            overflow-x: hidden;
+            padding: 20px;
         }
         
-        .topbar {
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .header {
+            width: 100%;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 16px;
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--line);
-            background: #0f1216;
-            border-radius: 10px;
-        }
-        
-        .brand {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-        
-        .brand .tri { 
-            font-size: 22px; 
-            opacity: .7; 
-        }
-        
-        .title { 
-            font-weight: 600; 
-            letter-spacing: .2px; 
-            font-size: 1.2rem;
-            margin: 0;
-        }
-        
-        .subtitle { 
-            color: var(--muted); 
-            font-size: 0.8rem; 
-            margin-top: 2px; 
-        }
-        
-        .controls { 
-            display: flex; 
-            gap: 16px; 
-            align-items: center; 
-        }
-        
-        .selects label { 
-            display: block; 
-            color: var(--muted); 
-            font-size: 0.8rem; 
-            margin-bottom: 6px; 
-        }
-        
-        .select-row { 
-            display: flex; 
-            gap: 8px; 
-        }
-        
-        select, button {
-            background: var(--panel);
-            color: var(--text);
-            border: 1px solid var(--line);
-            padding: 8px 10px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
-        
-        button:hover { 
-            background: #1c2129; 
-            border-color: #2f3743; 
-        }
-        
-        .buttons { 
-            display: flex; 
-            gap: 8px; 
-        }
-        
-        .main-content {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            overflow: hidden;
-            gap: 16px;
-        }
-        
-        .board-wrap {
-            background: #0b0e12;
-            border: 1px solid var(--line);
-            border-radius: 16px;
-            position: relative;
-            overflow: hidden;
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        #board {
-            display: block;
-            background: #0b1015;
-            border-radius: 8px;
-        }
-        
-        .sidebar {
-            background: var(--panel);
-            border: 1px solid var(--line);
-            border-radius: 16px;
-            padding: 14px 12px;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        h3 { 
-            margin: 8px 0 10px; 
-            font-weight: 600; 
-            font-size: 1.1rem;
-        }
-        
-        #inv { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 8px; 
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
             margin-bottom: 20px;
+            backdrop-filter: blur(10px);
         }
         
-        .inv-item {
+        .logo {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            padding: 10px;
-            border: 1px solid var(--line);
-            border-radius: 12px;
-            background: #12161b;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .inv-item:hover {
-            background: #1a222e;
-        }
-        
-        .inv-item.active { 
-            outline: 2px solid var(--accent);
-            background: #1a222e;
-        }
-        
-        .inv-item small { 
-            color: var(--muted); 
-            font-size: 0.8rem;
-        }
-        
-        .toolrow { 
-            display: flex; 
-            gap: 8px; 
-            margin-bottom: 8px; 
-        }
-        
-        .toolrow button.active { 
-            outline: 2px solid var(--accent);
-            background: #1c2129;
-        }
-        
-        .hint { 
-            color: var(--muted); 
-            margin: 6px 0;
-            font-size: 0.9rem;
-        }
-        
-        .toast {
-            position: absolute;
-            top: 12px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #0e141a;
-            border: 1px solid var(--line);
-            padding: 8px 12px;
-            border-radius: 10px;
-            color: var(--text);
-            opacity: 0;
-            transition: opacity 0.2s;
-            z-index: 100;
-            pointer-events: none;
-        }
-        
-        .toast.show { 
-            opacity: 1; 
-        }
-        
-        .win {
-            margin-top: 8px;
-            padding: 10px;
-            border-radius: 12px;
-            background: #0f1712;
-            border: 1px solid #1e3426;
-            text-align: center;
-        }
-        
-        .hidden { 
-            display: none; 
-        }
-        
-        kbd {
-            background: #10151b;
-            border: 1px solid var(--line);
-            border-radius: 6px;
-            padding: 2px 6px;
-            font-family: monospace;
-            font-size: 0.8rem;
-        }
-        
-        .instructions {
-            background: #12161b;
-            padding: 12px;
-            border-radius: 10px;
-            margin-top: 15px;
-            font-size: 0.85rem;
-            line-height: 1.5;
-        }
-        
-        .instructions p {
-            margin: 8px 0;
-        }
-        
-        .instructions strong {
-            color: var(--accent);
-        }
-        
-        #btnNext {
-            margin-top: 10px;
-            background: var(--ok);
-            color: #000;
+            gap: 10px;
+            font-size: 24px;
             font-weight: bold;
         }
         
-        #btnNext:hover {
-            background: #4ac57a;
+        .logo i {
+            color: #ffcc00;
         }
         
-        /* Mode paysage */
-        @media (min-width: 768px) {
+        .stats {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 15px;
+            border-radius: 50px;
+        }
+        
+        .stat i {
+            color: #ffcc00;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+            width: 100%;
+        }
+        
+        .game-board {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(10px);
+        }
+        
+        .board {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(8, 1fr);
+            gap: 6px;
+            margin: 0 auto;
+            width: 100%;
+            max-width: 500px;
+            aspect-ratio: 1/1;
+        }
+        
+        .tile {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 28px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .tile:before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0));
+            transform: rotate(45deg);
+            transition: all 0.3s;
+            opacity: 0;
+        }
+        
+        .tile:hover:before {
+            opacity: 1;
+        }
+        
+        .tile:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .tile.selected {
+            transform: scale(0.95);
+            box-shadow: 0 0 0 3px white;
+        }
+        
+        .tile.red { background: linear-gradient(135deg, #ff4e50 0%, #f9d423 100%); }
+        .tile.blue { background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%); }
+        .tile.green { background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%); }
+        .tile.purple { background: linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%); }
+        .tile.yellow { background: linear-gradient(135deg, #ffd200 0%, #f7971e 100%); }
+        .tile.orange { background: linear-gradient(135deg, #ff8008 0%, #ffc837 100%); }
+        
+        .objectives {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .objective {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 50px;
+        }
+        
+        .objective i {
+            font-size: 24px;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(135deg, #ffcc00 0%, #ff9900 100%);
+            color: #333;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .sidebar {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .section {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 15px;
+        }
+        
+        .section h3 {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+        }
+        
+        .section h3 i {
+            color: #ffcc00;
+        }
+        
+        .boosters {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        
+        .booster {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .booster:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.05);
+        }
+        
+        .booster i {
+            font-size: 24px;
+            color: #ffcc00;
+        }
+        
+        .levels {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        
+        .levels::-webkit-scrollbar {
+            width: 5px;
+        }
+        
+        .levels::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+        }
+        
+        .level {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .level:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+        
+        .level.current {
+            background: rgba(255, 204, 0, 0.3);
+            box-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+        }
+        
+        .level.completed i {
+            color: #ffcc00;
+            margin-left: 5px;
+        }
+        
+        .shop-items {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .shop-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .shop-item:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+        
+        .shop-item i {
+            color: #ffcc00;
+            font-size: 20px;
+        }
+        
+        .progress-container {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            height: 10px;
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(135deg, #ffcc00 0%, #ff9900 100%);
+            border-radius: 5px;
+            width: 65%;
+            transition: width 0.5s ease;
+        }
+        
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .moves, .score, .timer {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px 20px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .moves i, .score i, .timer i {
+            color: #ffcc00;
+        }
+        
+        @media (max-width: 900px) {
             .main-content {
-                flex-direction: row;
+                grid-template-columns: 1fr;
             }
             
-            .sidebar {
-                width: 300px;
-                min-width: 300px;
+            .board {
+                max-width: 400px;
             }
+        }
+        
+        @media (max-width: 600px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .stats {
+                width: 100%;
+                justify-content: space-around;
+            }
+            
+            .board {
+                max-width: 320px;
+            }
+            
+            .tile {
+                font-size: 20px;
+            }
+            
+            .controls {
+                flex-wrap: wrap;
+            }
+            
+            .btn {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+            
+            .game-info {
+                justify-content: center;
+            }
+        }
+        
+        /* Animations */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .pulse {
+            animation: pulse 0.5s ease-in-out;
+        }
+        
+        @keyframes explode {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+        
+        .explode {
+            animation: explode 0.3s ease-out;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        
+        .notification.show {
+            opacity: 1;
+        }
+        
+        .achievement {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        
+        .achievement.show {
+            opacity: 1;
+        }
+        
+        .combo-popup {
+            position: absolute;
+            font-size: 20px;
+            font-weight: bold;
+            color: #ffcc00;
+            z-index: 10;
+            pointer-events: none;
+            animation: floatUp 1s ease-out;
+        }
+        
+        @keyframes floatUp {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(-50px); opacity: 0; }
+        }
+        
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            transition: opacity 0.5s ease;
+        }
+        
+        .loading-title {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .loading-bar-container {
+            width: 300px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .loading-bar {
+            height: 100%;
+            background: linear-gradient(135deg, #ffcc00 0%, #ff9900 100%);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .loading-text {
+            font-size: 1.2rem;
         }
     </style>
 </head>
 <body>
-    <div class="topbar">
-        <div class="brand">
-            <div class="tri">△</div>
-            <div>
-                <div class="title">Alchimia Mechanica</div>
-                <div class="subtitle">Artisan Mécaniste — Reliez l'énergie aux récepteurs</div>
-            </div>
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-title">Royal Match Deluxe</div>
+        <div class="loading-bar-container">
+            <div class="loading-bar" id="loadingBar"></div>
         </div>
-        <div class="controls">
-            <div class="selects">
-                <label>Monde/Niveau</label>
-                <div class="select-row">
-                    <select id="worldSelect">
-                        <option value="0">Sylvaria</option>
-                    </select>
-                    <select id="levelSelect">
-                        <option value="0">Niveau 1</option>
-                        <option value="1">Niveau 2</option>
-                        <option value="2">Niveau 3</option>
-                    </select>
+        <div class="loading-text" id="loadingText">Chargement 0%</div>
+    </div>
+
+    <div class="container" id="gameContainer" style="display: none;">
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-crown"></i>
+                <span>Royal Match Deluxe</span>
+            </div>
+            <div class="stats">
+                <div class="stat">
+                    <i class="fas fa-coins"></i>
+                    <span id="coins">1250</span>
+                </div>
+                <div class="stat">
+                    <i class="fas fa-heart"></i>
+                    <span id="hearts">5</span>
+                </div>
+                <div class="stat">
+                    <i class="fas fa-gem"></i>
+                    <span id="gems">25</span>
                 </div>
             </div>
-            <div class="buttons">
-                <button id="btnUndo" title="Annuler (Z)">↩ Annuler</button>
-                <button id="btnReset">↻ Réinitialiser</button>
-                <button id="btnHelp">? Aide</button>
+        </div>
+        
+        <div class="game-info">
+            <div class="moves">
+                <i class="fas fa-sync-alt"></i>
+                <span id="moves">15</span>
+            </div>
+            <div class="score">
+                <i class="fas fa-star"></i>
+                <span id="score">0</span>
+            </div>
+            <div class="timer">
+                <i class="fas fa-clock"></i>
+                <span id="time">120</span>
+            </div>
+        </div>
+        
+        <div class="progress-container">
+            <div class="progress-bar" id="level-progress"></div>
+        </div>
+        
+        <div class="main-content">
+            <div class="game-board">
+                <div class="objectives">
+                    <div class="objective">
+                        <i class="fas fa-bullseye red"></i>
+                        <span>Objectif: 5000 points</span>
+                    </div>
+                    <div class="objective">
+                        <i class="fas fa-bullseye blue"></i>
+                        <span>20 bleus</span>
+                    </div>
+                </div>
+                
+                <div class="board" id="game-board">
+                    <!-- Les tuiles seront générées par JavaScript -->
+                </div>
+                
+                <div class="controls">
+                    <button class="btn" id="restartBtn"><i class="fas fa-redo"></i> Recommencer</button>
+                    <button class="btn" id="hintBtn"><i class="fas fa-lightbulb"></i> Indice</button>
+                    <button class="btn" id="boostersBtn"><i class="fas fa-bolt"></i> Boosters</button>
+                </div>
+            </div>
+            
+            <div class="sidebar">
+                <div class="section">
+                    <h3><i class="fas fa-fire"></i> Boosters</h3>
+                    <div class="boosters">
+                        <div class="booster" id="boosterBomb">
+                            <i class="fas fa-bomb"></i>
+                            <span>Bombe</span>
+                            <small>x3</small>
+                        </div>
+                        <div class="booster" id="boosterRainbow">
+                            <i class="fas fa-rainbow"></i>
+                            <span>Arc-en-ciel</span>
+                            <small>x2</small>
+                        </div>
+                        <div class="booster" id="boosterSwitch">
+                            <i class="fas fa-arrows-alt-h"></i>
+                            <span>Échange</span>
+                            <small>x5</small>
+                        </div>
+                        <div class="booster" id="boosterTime">
+                            <i class="fas fa-hourglass-half"></i>
+                            <span>+ Temps</span>
+                            <small>x2</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h3><i class="fas fa-list"></i> Niveaux</h3>
+                    <div class="levels" id="levelsContainer">
+                        <!-- Les niveaux seront générés par JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h3><i class="fas fa-store"></i> Boutique</h3>
+                    <div class="shop-items">
+                        <div class="shop-item">
+                            <i class="fas fa-coins"></i>
+                            <div>
+                                <div>1000 Pièces</div>
+                                <small>2,99 €</small>
+                            </div>
+                        </div>
+                        <div class="shop-item">
+                            <i class="fas fa-heart"></i>
+                            <div>
+                                <div>5 Vies</div>
+                                <small>1,99 €</small>
+                            </div>
+                        </div>
+                        <div class="shop-item">
+                            <i class="fas fa-gem"></i>
+                            <div>
+                                <div>10 Gemmes</div>
+                                <small>4,99 €</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-
-    <div class="main-content">
-        <div class="board-wrap">
-            <canvas id="board"></canvas>
-            <div id="toast" class="toast"></div>
+    
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <span>Niveau complété avec succès!</span>
+    </div>
+    
+    <div class="achievement" id="achievement">
+        <i class="fas fa-trophy"></i>
+        <div>
+            <div>Nouveau succès!</div>
+            <small>5 combos en un mouvement</small>
         </div>
-        <aside class="sidebar">
-            <h3>Inventaire</h3>
-            <div id="inv"></div>
-            
-            <h3>Outil</h3>
-            <div class="toolrow">
-                <button id="toolPlace" class="active">Placer</button>
-                <button id="toolErase">Supprimer</button>
-            </div>
-            
-            <h3>Contrôles</h3>
-            <div class="hint">Rotation : <kbd>R</kbd> (par pas de 60°)</div>
-            <div class="hint">Supprimer : clic droit / appui long</div>
-            
-            <h3 style="margin-top:20px">Objectif</h3>
-            <p>Relie <b>Source</b> → <b>Récepteur</b> en utilisant les pièces limitées.</p>
-            
-            <div class="instructions">
-                <p><strong>Comment jouer :</strong></p>
-                <p>1. Sélectionne une pièce dans l'inventaire</p>
-                <p>2. Clique sur la grille pour la placer</p>
-                <p>3. Appuie sur R pour faire pivoter les pièces</p>
-                <p>4. Relie la source (⚡) au récepteur (◎)</p>
-            </div>
-            
-            <div id="winCard" class="win hidden">
-                ✅ Circuit complet !<br/>
-                <button id="btnNext">Niveau suivant</button>
-            </div>
-        </aside>
     </div>
 
     <script>
-        // Alchimia Mechanica - Jeu de puzzle mécanique
-        (() => {
-            // Configuration
-            const TAU = Math.PI * 2;
-            const HEX = { size: 36 };
-            let hoverCell = null;
-            let pressTimer = null;
-
-            // Utilitaires
-            const $ = sel => document.querySelector(sel);
+        // Classe principale du jeu
+        class RoyalMatchGame {
+            constructor() {
+                this.colors = ['red', 'blue', 'green', 'purple', 'yellow', 'orange'];
+                this.icons = ['fas fa-heart', 'fas fa-star', 'fas fa-circle', 'fas fa-square', 'fas fa-diamond', 'fas fa-certificate'];
+                this.currentLevel = 1;
+                this.totalLevels = 15;
+                this.score = 0;
+                this.movesLeft = 15;
+                this.timeLeft = 120;
+                this.selectedTile = null;
+                this.isSwapping = false;
+                this.gameActive = false;
+                this.timerInterval = null;
+                
+                this.init();
+            }
             
-            // Conversion coordonnées hexagonales
-            const hexToPixel = ({ q, r }) => {
-                const x = HEX.size * (Math.sqrt(3) * q + Math.sqrt(3) / 2 * r);
-                const y = HEX.size * (3 / 2 * r);
-                return { x, y };
-            };
-
-            const pixelToHex = (x, y) => {
-                const q = (Math.sqrt(3) / 3 * x - 1 / 3 * y) / HEX.size;
-                const r = (2 / 3 * y) / HEX.size;
-                return hexRound({ q, r });
-            };
-
-            const hexRound = ({ q, r }) => {
-                let x = q, z = r, y = -x - z;
-                let rx = Math.round(x), ry = Math.round(y), rz = Math.round(z);
-                const x_diff = Math.abs(rx - x), y_diff = Math.abs(ry - y), z_diff = Math.abs(rz - z);
-                if (x_diff > y_diff && x_diff > z_diff) rx = -ry - rz;
-                else if (y_diff > z_diff) ry = -rx - rz;
-                else rz = -rx - ry;
-                return { q: rx, r: rz };
-            };
-
-            const hexNeighbors = [
-                { q: +1, r: 0 }, { q: +1, r: -1 }, { q: 0, r: -1 },
-                { q: -1, r: 0 }, { q: -1, r: +1 }, { q: 0, r: +1 }
-            ];
-
-            // Données de niveau
-            const WORLDS = [
-                {
-                    name: "Sylvaria",
-                    levels: [
-                        { w: 9, h: 7, inv: { source:1, conduit:10, gear:4, sink:1 }, preset: [] },
-                        { w: 9, h: 7, inv: { source:1, conduit:9, gear:5, sink:1 }, preset: [{t:"rock",q:2,r:1},{t:"rock",q:3,r:2}] },
-                        { w: 10, h: 8, inv: { source:1, conduit:12, gear:6, sink:1 }, preset: [{t:"rock",q:-1,r:0},{t:"rock",q:0,r:1},{t:"rock",q:1,r:2}] }
-                    ]
-                }
-            ];
-
-            // État global
-            const state = {
-                world: 0, 
-                level: 0,
-                grid: [], 
-                bounds: { minQ:0, maxQ:0, minR:0, maxR:0 },
-                inventory: { source:1, conduit:10, gear:4, sink:1 },
-                placed: new Map(),
-                history: [],
-                tool: "place",
-                selected: "conduit",
-                won: false
-            };
-
-            // Initialisation des éléments DOM
-            const worldSelect = $("#worldSelect");
-            const levelSelect = $("#levelSelect");
-            const board = $("#board");
-            const ctx = board.getContext("2d");
-            const invWrap = $("#inv");
-            const winCard = $("#winCard");
-            const toastEl = $("#toast");
-
-            // Fonctions d'interface
-            function toast(msg, ok = false) {
-                toastEl.textContent = msg;
-                toastEl.style.borderColor = ok ? "#1f4330" : "#2b1a1a";
-                toastEl.classList.add("show");
-                setTimeout(() => toastEl.classList.remove("show"), 2000);
+            init() {
+                this.setupEventListeners();
+                this.generateLevelsList();
+                this.showLoadingScreen();
             }
-
-            function buildInventoryUI() {
-                invWrap.innerHTML = "";
-                const items = [
-                    ["source", "⚡ Source"],
-                    ["conduit", "│ Conduit"],
-                    ["gear", "⚙️ Engrenage"],
-                    ["sink", "◎ Récepteur"],
-                ];
+            
+            showLoadingScreen() {
+                const loadingScreen = document.getElementById('loadingScreen');
+                const loadingBar = document.getElementById('loadingBar');
+                const loadingText = document.getElementById('loadingText');
+                const gameContainer = document.getElementById('gameContainer');
                 
-                for (const [k, label] of items) {
-                    const el = document.createElement("div");
-                    el.className = "inv-item" + (state.selected === k ? " active" : "");
-                    el.innerHTML = `<span>${label}</span><small>× ${state.inventory[k] ?? 0}</small>`;
-                    el.onclick = () => {
-                        state.selected = k;
-                        buildInventoryUI();
-                    };
-                    invWrap.appendChild(el);
-                }
-            }
-
-            // Gestion de la grille
-            function makeGrid(w, h) {
-                const cells = [];
-                const minQ = -Math.floor(w/2), maxQ = minQ + w - 1;
-                const minR = -Math.floor(h/2), maxR = minR + h - 1;
-                
-                for(let r = minR; r <= maxR; r++) {
-                    for(let q = minQ; q <= maxQ; q++) {
-                        cells.push({q, r});
-                    }
-                }
-                
-                state.bounds = {minQ, maxQ, minR, maxR};
-                state.grid = cells;
-            }
-
-            function keyQR(q, r) { 
-                return `${q},${r}`; 
-            }
-
-            function getCell(q, r) {
-                if (q < state.bounds.minQ || q > state.bounds.maxQ || r < state.bounds.minR || r > state.bounds.maxR) 
-                    return null;
-                return {q, r};
-            }
-
-            // Placement et suppression
-            function canPlace(type, q, r) {
-                if (!getCell(q, r)) return false;
-                const k = keyQR(q, r);
-                if (state.placed.has(k)) return false;
-                if ((state.inventory[type] ?? 0) <= 0) return false;
-                return true;
-            }
-
-            function place(type, q, r, rot = 0) {
-                if (!canPlace(type, q, r)) { 
-                    toast("Impossible de placer ici"); 
-                    return; 
-                }
-                
-                const k = keyQR(q, r);
-                state.history.push({op: "del", at: k, prev: null});
-                state.placed.set(k, {type, rot});
-                state.inventory[type]--;
-                
-                buildInventoryUI();
-                draw();
-                checkWin();
-            }
-
-            function erase(q, r) {
-                const k = keyQR(q, r);
-                const prev = state.placed.get(k);
-                if (!prev) return;
-                
-                state.history.push({op: "add", at: k, prev: prev});
-                state.placed.delete(k);
-                state.inventory[prev.type] = (state.inventory[prev.type] ?? 0) + 1;
-                
-                buildInventoryUI();
-                draw();
-            }
-
-            function undo() {
-                const ev = state.history.pop();
-                if (!ev) return;
-                
-                if (ev.op === "del") {
-                    const was = state.placed.get(ev.at);
-                    if (was) {
-                        state.placed.delete(ev.at);
-                        state.inventory[was.type] = (state.inventory[was.type] ?? 0) + 1;
-                    }
-                } else if (ev.op === "add") {
-                    state.placed.set(ev.at, ev.prev);
-                    state.inventory[ev.prev.type]--;
-                }
-                
-                buildInventoryUI();
-                draw();
-            }
-
-            // Simulation du flux d'énergie
-            function simulate() {
-                const queue = [];
-                const visited = new Set();
-                const powered = new Set();
-                
-                for (const [k, val] of state.placed) {
-                    if (val.type === "source") queue.push(k);
-                }
-                
-                while(queue.length) {
-                    const k = queue.shift();
-                    if (visited.has(k)) continue;
-                    
-                    visited.add(k);
-                    powered.add(k);
-                    
-                    const [q, r] = k.split(",").map(Number);
-                    const cur = state.placed.get(k);
-                    const outs = outputSides(cur);
-                    
-                    for (const s of outs) {
-                        const n = hexNeighbors[s];
-                        const nq = q + n.q;
-                        const nr = r + n.r;
-                        const nk = keyQR(nq, nr);
-                        const neigh = state.placed.get(nk);
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += Math.random() * 10;
+                    if (progress >= 100) {
+                        progress = 100;
+                        clearInterval(interval);
                         
-                        if (!neigh) continue;
+                        loadingBar.style.width = '100%';
+                        loadingText.textContent = 'Chargement 100%';
                         
-                        const opp = (s + 3) % 6;
-                        const nouts = outputSides(neigh);
-                        
-                        if (nouts.has(opp) && !visited.has(nk)) {
-                            queue.push(nk);
-                        }
-                    }
-                }
-                
-                return { powered };
-            }
-
-            function outputSides(cell) {
-                const set = new Set();
-                if (!cell) return set;
-                
-                const r = ((cell.rot % 6) + 6) % 6;
-                
-                switch(cell.type) {
-                    case "conduit":
-                        set.add(r);
-                        set.add((r + 3) % 6);
-                        break;
-                    case "gear":
-                    case "source":
-                        for(let i = 0; i < 6; i++) set.add(i);
-                        break;
-                }
-                
-                return set;
-            }
-
-            function checkWin() {
-                const {powered} = simulate();
-                let ok = true;
-                
-                for (const [k, val] of state.placed) {
-                    if (val.type !== "sink") continue;
-                    if (!powered.has(k)) ok = false;
-                }
-                
-                state.won = ok && hasAtLeastOne("source") && hasAtLeastOne("sink");
-                winCard.classList.toggle("hidden", !state.won);
-                
-                if (state.won) toast("Circuit complet ! Niveau réussi!", true);
-            }
-
-            function hasAtLeastOne(t) {
-                for (const [, v] of state.placed) 
-                    if (v.type === t) return true;
-                return false;
-            }
-
-            // Rendu graphique
-            function draw() {
-                const w = board.width;
-                const h = board.height;
-                
-                ctx.clearRect(0, 0, w, h);
-                
-                // Centrage de la grille
-                const {minQ, maxQ, minR, maxR} = state.bounds;
-                const gridW = (maxQ - minQ + 1);
-                const gridH = (maxR - minR + 1);
-                
-                const worldW = Math.sqrt(3) * HEX.size * (gridW + 0.5);
-                const worldH = (3/2) * HEX.size * (gridH + 0.5);
-                
-                const offsetX = (w - worldW) / 2;
-                const offsetY = (h - worldH) / 2;
-                
-                // Fond
-                ctx.fillStyle = "#0b1015";
-                ctx.fillRect(0, 0, w, h);
-                
-                // Cellules de la grille
-                for (const c of state.grid) {
-                    const p = hexToPixel(c);
-                    const x = p.x + offsetX + worldW/2;
-                    const y = p.y + offsetY + worldH/2;
-                    
-                    drawHex(x, y, HEX.size-1, "#12161b", "#1a222e");
-                    
-                    const k = keyQR(c.q, c.r);
-                    const item = state.placed.get(k);
-                    
-                    if (item) drawItem(x, y, item);
-                }
-                
-                // Cellule survolée
-                if (hoverCell) {
-                    const p = hexToPixel(hoverCell);
-                    const x = p.x + offsetX + worldW/2;
-                    const y = p.y + offsetY + worldH/2;
-                    
-                    drawHex(x, y, HEX.size-1, "#18212b", "#273244", 2);
-                }
-                
-                // Fonctions de dessin auxiliaires
-                function drawHex(x, y, r, fill, stroke, w = 1) {
-                    ctx.beginPath();
-                    for(let i = 0; i < 6; i++) {
-                        const a = TAU * (i/6) + TAU/12;
-                        const px = x + Math.cos(a) * r;
-                        const py = y + Math.sin(a) * r;
-                        
-                        if (i === 0) ctx.moveTo(px, py);
-                        else ctx.lineTo(px, py);
-                    }
-                    ctx.closePath();
-                    
-                    ctx.fillStyle = fill;
-                    ctx.fill();
-                    
-                    ctx.lineWidth = w;
-                    ctx.strokeStyle = stroke;
-                    ctx.stroke();
-                }
-                
-                function drawItem(x, y, item) {
-                    ctx.save();
-                    ctx.translate(x, y);
-                    ctx.rotate((item.rot % 6) * TAU/6);
-                    
-                    if (item.type === "conduit") {
-                        ctx.strokeStyle = "#3a78ff";
-                        ctx.lineWidth = 6;
-                        ctx.beginPath();
-                        ctx.moveTo(-HEX.size * 0.8, 0);
-                        ctx.lineTo(HEX.size * 0.8, 0);
-                        ctx.stroke();
-                    } else if (item.type === "gear") {
-                        ctx.strokeStyle = "#ffd24a";
-                        ctx.fillStyle = "#2b2210";
-                        gearPath(HEX.size * 0.7);
-                        ctx.fill();
-                        ctx.stroke();
-                    } else if (item.type === "source") {
-                        ctx.fillStyle = "#203014";
-                        ctx.strokeStyle = "#86ff68";
-                        circle(0, 0, HEX.size * 0.55);
-                        bolt();
-                    } else if (item.type === "sink") {
-                        ctx.strokeStyle = "#c9e1ff";
-                        ctx.fillStyle = "#16212d";
-                        circle(0, 0, HEX.size * 0.55);
-                        
-                        ctx.font = "700 18px sans-serif";
-                        ctx.fillStyle = "#9cc9ff";
-                        ctx.textAlign = "center";
-                        ctx.textBaseline = "middle";
-                        ctx.fillText("◎", 0, 1);
-                    }
-                    
-                    ctx.restore();
-                    
-                    function circle(x, y, r) {
-                        ctx.beginPath();
-                        ctx.arc(x, y, r, 0, TAU);
-                        ctx.fill();
-                        ctx.lineWidth = 2;
-                        ctx.stroke();
-                    }
-                    
-                    function gearPath(r) {
-                        ctx.beginPath();
-                        const teeth = 8;
-                        
-                        for(let i = 0; i < teeth; i++) {
-                            const a = (i/teeth) * TAU;
-                            const a2 = ((i+0.5)/teeth) * TAU;
-                            
-                            ctx.lineTo(Math.cos(a)*r, Math.sin(a)*r);
-                            ctx.lineTo(Math.cos(a2)*(r*0.82), Math.sin(a2)*(r*0.82));
-                        }
-                        
-                        ctx.closePath();
-                    }
-                    
-                    function bolt() {
-                        ctx.fillStyle = "#86ff68";
-                        ctx.beginPath();
-                        ctx.moveTo(-6, -2);
-                        ctx.lineTo(0, -12);
-                        ctx.lineTo(0, -3);
-                        ctx.lineTo(6, -5);
-                        ctx.lineTo(-2, 12);
-                        ctx.lineTo(-2, 1);
-                        ctx.closePath();
-                        ctx.fill();
-                    }
-                }
-            }
-
-            // Gestion des entrées
-            function pickCellFromEvent(ev) {
-                const rect = board.getBoundingClientRect();
-                const x = (ev.touches ? ev.touches[0].clientX : ev.clientX) - rect.left;
-                const y = (ev.touches ? ev.touches[0].clientY : ev.clientY) - rect.top;
-                
-                const {minQ, maxQ, minR, maxR} = state.bounds;
-                const gridW = (maxQ - minQ + 1);
-                const gridH = (maxR - minR + 1);
-                
-                const worldW = Math.sqrt(3) * HEX.size * (gridW + 0.5);
-                const worldH = (3/2) * HEX.size * (gridH + 0.5);
-                
-                const ox = (board.width - worldW)/2 + worldW/2;
-                const oy = (board.height - worldH)/2 + worldH/2;
-                
-                const hx = x - ox;
-                const hy = y - oy;
-                
-                const h = pixelToHex(hx, hy);
-                return getCell(h.q, h.r);
-            }
-
-            function doPlaceOrErase(c) {
-                if (!c) return;
-                
-                if (state.tool === "erase") {
-                    erase(c.q, c.r);
-                } else {
-                    place(state.selected, c.q, c.r, 0);
-                }
-            }
-
-            // Initialisation des événements
-            function initEvents() {
-                // Souris
-                board.addEventListener("mousemove", ev => {
-                    hoverCell = pickCellFromEvent(ev);
-                    draw();
-                });
-                
-                board.addEventListener("mouseleave", () => {
-                    hoverCell = null;
-                    draw();
-                });
-                
-                board.addEventListener("mousedown", ev => {
-                    ev.preventDefault();
-                    const c = pickCellFromEvent(ev);
-                    
-                    if (ev.button === 2) {
-                        erase(c?.q, c?.r);
-                        return;
-                    }
-                    
-                    pressTimer = setTimeout(() => {
-                        erase(c?.q, c?.r);
-                        pressTimer = null;
-                    }, 500);
-                });
-                
-                board.addEventListener("mouseup", ev => {
-                    ev.preventDefault();
-                    const c = pickCellFromEvent(ev);
-                    
-                    if (pressTimer) {
-                        clearTimeout(pressTimer);
-                        pressTimer = null;
-                        doPlaceOrErase(c);
-                    }
-                });
-                
-                board.addEventListener("contextmenu", ev => ev.preventDefault());
-                
-                // Tactile
-                board.addEventListener("touchstart", ev => {
-                    const c = pickCellFromEvent(ev);
-                    pressTimer = setTimeout(() => {
-                        erase(c?.q, c?.r);
-                        pressTimer = null;
-                    }, 500);
-                }, {passive: false});
-                
-                board.addEventListener("touchend", ev => {
-                    if (pressTimer) {
-                        clearTimeout(pressTimer);
-                        pressTimer = null;
-                        const c = hoverCell;
-                        doPlaceOrErase(c);
-                    }
-                });
-                
-                // Clavier
-                window.addEventListener("keydown", e => {
-                    if (e.key.toLowerCase() === "r" && hoverCell) {
-                        const k = keyQR(hoverCell.q, hoverCell.r);
-                        const it = state.placed.get(k);
-                        if (it) {
-                            it.rot = (it.rot + 1) % 6;
-                            draw();
-                            checkWin();
-                        }
-                    } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") {
-                        undo();
-                    }
-                });
-                
-                // Boutons d'interface
-                $("#toolPlace").onclick = () => {
-                    state.tool = "place";
-                    $("#toolPlace").classList.add("active");
-                    $("#toolErase").classList.remove("active");
-                };
-                
-                $("#toolErase").onclick = () => {
-                    state.tool = "erase";
-                    $("#toolErase").classList.add("active");
-                    $("#toolPlace").classList.remove("active");
-                };
-                
-                $("#btnUndo").onclick = undo;
-                $("#btnReset").onclick = () => loadLevel(state.world, state.level, true);
-                $("#btnHelp").onclick = () => toast("Place → R pivote → relie Source et Récepteur");
-                $("#btnNext").onclick = () => {
-                    const next = state.level + 1;
-                    if (next < WORLDS[state.world].levels.length) {
-                        levelSelect.value = next;
-                        changeLevel();
+                        setTimeout(() => {
+                            loadingScreen.style.opacity = '0';
+                            setTimeout(() => {
+                                loadingScreen.style.display = 'none';
+                                gameContainer.style.display = 'flex';
+                                this.startGame();
+                            }, 500);
+                        }, 500);
                     } else {
-                        toast("Félicitations! Vous avez terminé tous les niveaux!", true);
+                        loadingBar.style.width = `${progress}%`;
+                        loadingText.textContent = `Chargement ${Math.round(progress)}%`;
                     }
-                };
-                
-                worldSelect.onchange = () => {
-                    state.world = +worldSelect.value;
-                    changeLevel();
-                };
-                
-                levelSelect.onchange = changeLevel;
-            }
-
-            // Chargement des niveaux
-            function loadLevel(wi, li, reset = false) {
-                const L = WORLDS[wi].levels[li];
-                makeGrid(L.w, L.h);
-                state.placed.clear();
-                state.history = [];
-                state.won = false;
-                state.inventory = structuredClone(L.inv);
-                
-                // Placement de la source et du récepteur
-                const q0 = state.bounds.minQ + 1;
-                const r0 = 0;
-                const q1 = state.bounds.maxQ - 1;
-                const r1 = 0;
-                
-                placeSilent("source", q0, r0, 0);
-                placeSilent("sink", q1, r1, 0);
-                
-                buildInventoryUI();
-                draw();
-                winCard.classList.add("hidden");
+                }, 100);
             }
             
-            function placeSilent(type, q, r, rot) {
-                const k = keyQR(q, r);
-                state.placed.set(k, {type, rot});
+            startGame() {
+                this.generateBoard();
+                this.startTimer();
+                this.gameActive = true;
+                this.updateUI();
+            }
+            
+            generateBoard() {
+                const gameBoard = document.getElementById('game-board');
+                gameBoard.innerHTML = '';
                 
-                if (type !== "source" && type !== "sink") {
-                    state.inventory[type]--;
+                for (let i = 0; i < 64; i++) {
+                    const randomColor = this.colors[Math.floor(Math.random() * this.colors.length)];
+                    const randomIcon = this.icons[Math.floor(Math.random() * this.icons.length)];
+                    
+                    const tile = document.createElement('div');
+                    tile.className = `tile ${randomColor}`;
+                    tile.innerHTML = `<i class="${randomIcon}"></i>`;
+                    tile.dataset.index = i;
+                    tile.dataset.color = randomColor;
+                    
+                    tile.addEventListener('click', () => this.handleTileClick(tile));
+                    
+                    gameBoard.appendChild(tile);
                 }
             }
             
-            function changeLevel() {
-                state.level = +levelSelect.value;
-                loadLevel(state.world, state.level, true);
-            }
-
-            // Initialisation de l'application
-            function bootstrap() {
-                // Dimensionnement du canvas
-                function resizeCanvas() {
-                    const container = board.parentElement;
-                    board.width = container.clientWidth;
-                    board.height = container.clientHeight;
-                    draw();
+            handleTileClick(tile) {
+                if (!this.gameActive || this.isSwapping) return;
+                
+                if (this.selectedTile === null) {
+                    // Première sélection
+                    this.selectedTile = tile;
+                    tile.classList.add('selected');
+                } else {
+                    // Deuxième sélection - essayez d'échanger
+                    if (this.selectedTile === tile) {
+                        // Désélectionner si on clique sur la même tuile
+                        tile.classList.remove('selected');
+                        this.selectedTile = null;
+                    } else if (this.areAdjacent(this.selectedTile, tile)) {
+                        // Échanger les tuiles adjacentes
+                        this.swapTiles(this.selectedTile, tile);
+                    } else {
+                        // Sélectionner une nouvelle tuile
+                        this.selectedTile.classList.remove('selected');
+                        this.selectedTile = tile;
+                        tile.classList.add('selected');
+                    }
                 }
-                
-                // Initialisation
-                resizeCanvas();
-                window.addEventListener('resize', resizeCanvas);
-                
-                initEvents();
-                loadLevel(0, 0, true);
-                buildInventoryUI();
             }
             
-            // Lancement du jeu
-            bootstrap();
-        })();
+            areAdjacent(tile1, tile2) {
+                const index1 = parseInt(tile1.dataset.index);
+                const index2 = parseInt(tile2.dataset.index);
+                
+                // Vérifier si les tuiles sont adjacentes horizontalement ou verticalement
+                const diff = Math.abs(index1 - index2);
+                return diff === 1 || diff === 8;
+            }
+            
+            swapTiles(tile1, tile2) {
+                this.isSwapping = true;
+                
+                // Échanger les données
+                const index1 = tile1.dataset.index;
+                const index2 = tile2.dataset.index;
+                
+                tile1.dataset.index = index2;
+                tile2.dataset.index = index1;
+                
+                // Échanger les positions visuelles
+                const tempHTML = tile1.innerHTML;
+                const tempColor = tile1.dataset.color;
+                const tempClass = tile1.className;
+                
+                tile1.innerHTML = tile2.innerHTML;
+                tile1.dataset.color = tile2.dataset.color;
+                tile1.className = tile2.className;
+                
+                tile2.innerHTML = tempHTML;
+                tile2.dataset.color = tempColor;
+                tile2.className = tempClass;
+                
+                // Réappliquer les écouteurs d'événements
+                tile1.addEventListener('click', () => this.handleTileClick(tile1));
+                tile2.addEventListener('click', () => this.handleTileClick(tile2));
+                
+                // Désélectionner
+                tile1.classList.remove('selected');
+                tile2.classList.remove('selected');
+                this.selectedTile = null;
+                
+                // Vérifier les correspondances après l'échange
+                setTimeout(() => {
+                    this.checkMatches();
+                    this.movesLeft--;
+                    this.updateUI();
+                    
+                    if (this.movesLeft <= 0) {
+                        this.endGame(false);
+                    }
+                    
+                    this.isSwapping = false;
+                }, 300);
+            }
+            
+            checkMatches() {
+                // Ici, vous implémenteriez la logique pour vérifier les correspondances
+                // Pour l'instant, nous allons simplement ajouter des points aléatoires
+                const points = Math.floor(Math.random() * 100) + 50;
+                this.addScore(points);
+                
+                // Afficher un popup de combo
+                this.showComboPopup(points);
+            }
+            
+            addScore(points) {
+                this.score += points;
+                
+                // Mettre à jour la barre de progression
+                const progressBar = document.getElementById('level-progress');
+                const progressPercentage = Math.min(100, (this.score / 5000) * 100);
+                progressBar.style.width = `${progressPercentage}%`;
+                
+                // Vérifier si le niveau est complété
+                if (this.score >= 5000) {
+                    this.endGame(true);
+                }
+            }
+            
+            showComboPopup(points) {
+                const gameBoard = document.getElementById('game-board');
+                const popup = document.createElement('div');
+                popup.className = 'combo-popup';
+                popup.textContent = `+${points}`;
+                popup.style.left = `${Math.random() * 80 + 10}%`;
+                popup.style.top = `${Math.random() * 80 + 10}%`;
+                
+                gameBoard.appendChild(popup);
+                
+                setTimeout(() => {
+                    gameBoard.removeChild(popup);
+                }, 1000);
+            }
+            
+            startTimer() {
+                if (this.timerInterval) {
+                    clearInterval(this.timerInterval);
+                }
+                
+                this.timerInterval = setInterval(() => {
+                    this.timeLeft--;
+                    document.getElementById('time').textContent = this.timeLeft;
+                    
+                    if (this.timeLeft <= 0) {
+                        this.endGame(false);
+                    }
+                }, 1000);
+            }
+            
+            endGame(isWin) {
+                this.gameActive = false;
+                clearInterval(this.timerInterval);
+                
+                if (isWin) {
+                    this.showNotification('Niveau complété!');
+                    setTimeout(() => {
+                        this.showAchievement('Nouveau record! 3 étoiles');
+                    }, 1500);
+                    
+                    // Débloquer le niveau suivant
+                    const currentLevelElem = document.querySelector(`.level[data-level="${this.currentLevel}"]`);
+                    if (currentLevelElem) {
+                        currentLevelElem.classList.add('completed');
+                        currentLevelElem.innerHTML = `${this.currentLevel} <i class="fas fa-check"></i>`;
+                    }
+                    
+                    // Passer au niveau suivant après un délai
+                    setTimeout(() => {
+                        this.currentLevel++;
+                        if (this.currentLevel > this.totalLevels) {
+                            this.currentLevel = 1;
+                        }
+                        this.resetGame();
+                    }, 3000);
+                } else {
+                    this.showNotification('Temps écoulé! Essayez encore.');
+                    
+                    // Réinitialiser après un délai
+                    setTimeout(() => {
+                        this.resetGame();
+                    }, 2000);
+                }
+            }
+            
+            resetGame() {
+                this.score = 0;
+                this.movesLeft = 15;
+                this.timeLeft = 120;
+                this.selectedTile = null;
+                
+                this.generateBoard();
+                this.startTimer();
+                this.gameActive = true;
+                this.updateUI();
+            }
+            
+            updateUI() {
+                document.getElementById('score').textContent = this.score;
+                document.getElementById('moves').textContent = this.movesLeft;
+                document.getElementById('time').textContent = this.timeLeft;
+            }
+            
+            showNotification(message) {
+                const notification = document.getElementById('notification');
+                notification.querySelector('span').textContent = message;
+                notification.classList.add('show');
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+            
+            showAchievement(message) {
+                const achievement = document.getElementById('achievement');
+                achievement.querySelector('div > div').textContent = message;
+                achievement.classList.add('show');
+                
+                setTimeout(() => {
+                    achievement.classList.remove('show');
+                }, 3000);
+            }
+            
+            generateLevelsList() {
+                const levelsContainer = document.getElementById('levelsContainer');
+                levelsContainer.innerHTML = '';
+                
+                for (let i = 1; i <= this.totalLevels; i++) {
+                    const level = document.createElement('div');
+                    level.className = 'level';
+                    if (i === this.currentLevel) {
+                        level.classList.add('current');
+                    }
+                    level.dataset.level = i;
+                    level.textContent = i;
+                    
+                    level.addEventListener('click', () => {
+                        if (i <= this.currentLevel) {
+                            this.currentLevel = i;
+                            this.resetGame();
+                            
+                            document.querySelectorAll('.level').forEach(lvl => {
+                                lvl.classList.remove('current');
+                            });
+                            level.classList.add('current');
+                        }
+                    });
+                    
+                    levelsContainer.appendChild(level);
+                }
+            }
+            
+            setupEventListeners() {
+                // Bouton recommencer
+                document.getElementById('restartBtn').addEventListener('click', () => {
+                    this.resetGame();
+                });
+                
+                // Bouton indice
+                document.getElementById('hintBtn').addEventListener('click', () => {
+                    this.showNotification('Indice activé! Cherchez les groupes de 3+ tuiles.');
+                });
+                
+                // Bouton boosters
+                document.getElementById('boostersBtn').addEventListener('click', () => {
+                    this.showNotification('Menu boosters ouvert!');
+                });
+                
+                // Boosters individuels
+                document.getElementById('boosterBomb').addEventListener('click', () => {
+                    this.showNotification('Bombe activée!');
+                });
+                
+                document.getElementById('boosterRainbow').addEventListener('click', () => {
+                    this.showNotification('Arc-en-ciel activé!');
+                });
+                
+                document.getElementById('boosterSwitch').addEventListener('click', () => {
+                    this.showNotification('Échange activé!');
+                });
+                
+                document.getElementById('boosterTime').addEventListener('click', () => {
+                    this.timeLeft += 30;
+                    this.updateUI();
+                    this.showNotification('+30 secondes!');
+                });
+            }
+        }
+
+        // Initialiser le jeu quand la page est chargée
+        document.addEventListener('DOMContentLoaded', function() {
+            const game = new RoyalMatchGame();
+        });
     </script>
 </body>
 </html>
